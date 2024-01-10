@@ -31,6 +31,11 @@ export default function Header() {
               About
             </li>
           </Link>
+          <Link to="/sign-in">
+            <li className="hidden sm:inline text-slate-700 hover:underline">
+              Sign In
+            </li>
+          </Link>
           <Link to="/profile">
             <img className="rounded-full h-7 w-7 object-cover" alt="profile" />
           </Link>
