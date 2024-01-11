@@ -1,3 +1,4 @@
+import OAuth from "../components/OAuth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -74,7 +75,9 @@ export default function SignUp() {
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
     </svg>}
           </button>
+          <OAuth />
         </form>
+        
         <div className="flex justify-center gap-2 mt-5">
           <p>Have an account?</p>
           <Link to={"/sign-in"}>
@@ -82,6 +85,7 @@ export default function SignUp() {
           </Link>
         </div>
         {error && <p className='text-red-500 mt-5'>{error}</p>}
+        
       </div>
     </div>
   );
