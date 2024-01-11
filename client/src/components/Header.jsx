@@ -34,6 +34,7 @@ export default function Header() {
               About
             </li>
           </Link>
+          {currentUser ? currentUser.username : '' }
           <Link to='/profile'>
             {currentUser ? (
               <img

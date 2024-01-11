@@ -1,12 +1,14 @@
 import { useSelector } from "react-redux";
 import { useRef, useState, useEffect } from "react";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { getDownloadURL,getStorage,ref,uploadBytesResumable } from "firebase/storage";
 import { app } from "../firebase";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure
+} from '../redux/user/userSlice';
+import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -15,6 +17,7 @@ export default function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const dispatch = useDispatch();
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   useEffect(() => {
@@ -47,11 +50,39 @@ export default function Profile() {
     );
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
+
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
+    } catch (error) {
+      dispatch(updateUserFailure(error.message));
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 text-slate-700">Profile</h1>
       <div className="bg-white p-7 rounded-2xl">
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             onChange={(e) => setFile(e.target.files[0])}
             type="file"
@@ -86,6 +117,7 @@ export default function Profile() {
             defaultValue={currentUser.username}
             id="username"
             className="border p-3 rounded-lg"
+            onChange={handleChange}
           />
           <input
             type="email"
@@ -93,24 +125,30 @@ export default function Profile() {
             id="email"
             defaultValue={currentUser.email}
             className="border p-3 rounded-lg"
+            onChange={handleChange}
           />
           <input
             type="password"
             placeholder="password"
             id="password"
             className="border p-3 rounded-lg"
+            onChange={handleChange}
           />
-          <button
-            disabled={loading}
-            className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
-          >
-            Update
+          <button disabled={loading} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+            {!loading ? "Update" : <svg class="animate-spin mx-auto h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="currentColor" stroke-width="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>}
           </button>
         </form>
         <div className="flex justify-between mt-5">
           <span className="text-red-700 cursor-pointer">Delete account</span>
           <span className="text-red-700 cursor-pointer">Sign out</span>
         </div>
+        <p className='text-red-700 mt-5'>{error ? error : ''}</p>
+        <p className='text-green-700 mt-5'>
+          {updateSuccess ? 'User is updated successfully!' : ''}
+        </p>
       </div>
     </div>
   );
