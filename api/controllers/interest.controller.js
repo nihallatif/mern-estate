@@ -1,3 +1,4 @@
+import { errorHandler } from '../utils/error.js';
 import Interest from "../models/interest.model.js";
 import UserInterest from "../models/userinterest.model.js";
 
@@ -19,6 +20,19 @@ export const getInterests = async (req, res, next) => {
 };
 export const createUserInterest = async (req, res, next) => {
   try {
+    console.log(req.body.userId)
+    let check = await UserInterest.findOne({ userId: req.body.userId })
+
+    // if (check) {
+    //   req.body.interestIds.forEach(interestId => { 
+    //     if (!check.interestIds.includes(interestId)) {
+    //       // Add the interestId if it's not already in the array
+    //       check.interestIds.push(interestId);
+    //     }
+    //   })
+    //   return next(errorHandler(201, 'UPDATED'));
+    // }
+
     const interest = await UserInterest.create(req.body);
     return res.status(201).json(interest);
   } catch (error) {

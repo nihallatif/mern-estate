@@ -32,9 +32,9 @@ export default function Header() {
                   Home
                 </li>
               </Link>
-              <Link to="/about">
+              <Link to="/interests">
                 <li className="hidden sm:inline text-white hover:underline">
-                  About
+                  Interests
                 </li>
               </Link>
               {currentUser ? <span className="text-white">{currentUser.username}</span> : ''}
